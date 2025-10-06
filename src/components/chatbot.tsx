@@ -1,19 +1,20 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Mic, Send, Bot, User, Volume2, Loader2, University } from "lucide-react";
+import { Mic, Send, Bot, User, Volume2, Loader2, University, Pause, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { getResponse, type Message as ActionMessage } from "@/app/actions";
+import { getResponse, getAudio, type Message as ActionMessage } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 
 interface Message extends ActionMessage {
   id: string;
   language?: string;
+  audioData?: string;
 }
 
 // For cross-browser compatibility
@@ -32,6 +33,9 @@ export default function Chatbot() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [nowPlaying, setNowPlaying] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
   const { toast } = useToast();
@@ -107,43 +111,63 @@ export default function Chatbot() {
     }
   };
 
+  const handlePlayAudio = async (messageId: string, text: string) => {
+    if (nowPlaying === messageId) {
+      if (audioRef.current) {
+        if (audioRef.current.paused) {
+          audioRef.current.play();
+        } else {
+          audioRef.current.pause();
+        }
+      }
+      return;
+    }
 
-  const playAudio = useCallback((text: string, lang: string = 'en-US') => {
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      const voices = window.speechSynthesis.getVoices();
-      let selectedVoice = voices.find(voice => voice.lang.startsWith(lang.split('-')[0]));
-      
-      if (!selectedVoice) {
-        selectedVoice = voices.find(voice => voice.lang === lang);
-      }
-      if (!selectedVoice) {
-        selectedVoice = voices.find(voice => voice.lang.startsWith('en'));
-      }
-      
-      if(selectedVoice) {
-          utterance.voice = selectedVoice;
-      }
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
 
-      utterance.lang = selectedVoice ? selectedVoice.lang : 'en-US';
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utterance);
-    } else {
+    const message = messages.find(m => m.id === messageId);
+    if (message && message.audioData) {
+      playAudioFromData(message.audioData, messageId);
+      return;
+    }
+
+    try {
+      const { media } = await getAudio(text);
+      setMessages(prev => prev.map(m => m.id === messageId ? { ...m, audioData: media } : m));
+      playAudioFromData(media, messageId);
+    } catch (e) {
+      console.error(e);
+      toast({
+        variant: 'destructive',
+        title: 'Audio Error',
+        description: 'Failed to generate audio for the message.',
+      });
+    }
+  };
+
+  const playAudioFromData = (audioData: string, messageId: string) => {
+    const audio = new Audio(audioData);
+    audioRef.current = audio;
+
+    audio.onplay = () => setNowPlaying(messageId);
+    audio.onpause = () => setNowPlaying(null);
+    audio.onended = () => {
+      setNowPlaying(null);
+      audioRef.current = null;
+    };
+    audio.onerror = () => {
         toast({
-            title: "Unsupported Browser",
-            description: "Your browser does not support text-to-speech.",
-            variant: "destructive"
+            variant: 'destructive',
+            title: 'Audio Error',
+            description: 'Could not play the audio file.',
         });
-    }
-  }, [toast]);
+        setNowPlaying(null);
+    };
+    audio.play();
+  }
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.getVoices();
-      };
-    }
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -159,7 +183,7 @@ export default function Chatbot() {
     setInput("");
     setIsLoading(true);
 
-    const history: ActionMessage[] = newMessages.map(({ id, language, ...rest }) => rest);
+    const history: ActionMessage[] = newMessages.map(({ id, language, audioData, ...rest }) => rest);
 
     try {
       const result = await getResponse(history, input);
@@ -227,9 +251,9 @@ export default function Chatbot() {
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 mt-2 text-muted-foreground/70 hover:text-foreground"
-                        onClick={() => playAudio(msg.content, msg.language)}
+                        onClick={() => handlePlayAudio(msg.id, msg.content)}
                       >
-                        <Volume2 className="h-4 w-4" />
+                        {nowPlaying === msg.id && audioRef.current && !audioRef.current.paused ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                      </Button>
                   )}
                 </div>

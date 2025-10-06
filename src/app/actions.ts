@@ -1,6 +1,7 @@
 "use server";
 
 import { handleIntentBasedQuery, type IntentBasedQueryOutput } from "@/ai/flows/intent-based-query-handling";
+import { textToSpeech } from "@/ai/flows/text-to-speech";
 
 export interface Message {
   role: "user" | "bot";
@@ -19,4 +20,8 @@ export async function getResponse(history: Message[], query: string): Promise<In
     // It's better to throw an error and let the client handle it
     throw new Error("Failed to get response from AI.");
   }
+}
+
+export async function getAudio(text: string): Promise<{media: string}> {
+    return await textToSpeech({ text });
 }
