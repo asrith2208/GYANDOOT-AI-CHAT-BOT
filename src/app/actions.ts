@@ -8,20 +8,28 @@ export interface Message {
   content: string;
 }
 
-export async function getResponse(history: Message[], query: string): Promise<IntentBasedQueryOutput> {
+export async function getResponseAndAudio(history: Message[], query: string): Promise<IntentBasedQueryOutput & { audioData?: string }> {
   try {
     const response = await handleIntentBasedQuery({ history, query });
     if (!response || !response.answer || !response.language) {
         throw new Error("Invalid response from AI model.");
     }
-    return response;
+    
+    // Generate audio in parallel
+    const audioPromise = textToSpeech({ text: response.answer }).catch(err => {
+      console.error("Failed to generate audio:", err);
+      return { media: "" }; // Return empty media on failure
+    });
+
+    const audioResult = await audioPromise;
+
+    return {
+        ...response,
+        audioData: audioResult.media
+    };
+
   } catch (error) {
     console.error("Error getting response from AI:", error);
-    // It's better to throw an error and let the client handle it
     throw new Error("Failed to get response from AI.");
   }
-}
-
-export async function getAudio(text: string): Promise<{media: string}> {
-    return await textToSpeech({ text });
 }
