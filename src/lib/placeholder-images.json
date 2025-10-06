@@ -2,9 +2,15 @@
   "placeholderImages": [
     {
       "id": "university-campus",
-      "description": "A sprawling, modern university campus with green lawns and impressive architecture under a clear blue sky.",
-      "imageUrl": "https://images.unsplash.com/photo-1592280771190-3e2e4d571952?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHx1bml2ZXJzaXR5JTIwY2FtcHVzfGVufDB8fHx8MTc1OTYyNzIyMnww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "university campus"
+      "description": "Doon Management School campus building.",
+      "imageUrl": "https://doonmanagementschool.in/wp-content/uploads/2021/11/DMS-Dehradun-scaled-1.jpg",
+      "imageHint": "college campus"
+    },
+    {
+      "id": "university-logo",
+      "description": "Uttaranchal University Logo",
+      "imageUrl": "https://cdn.prod.website-files.com/63a98d7ca37497b26e5ba22c/663e0018128475ea76c30c44_Uttranchal%20University%20(1).jpeg",
+      "imageHint": "university logo"
     }
   ]
 }

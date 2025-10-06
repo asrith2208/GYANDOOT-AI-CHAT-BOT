@@ -1,15 +1,17 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Mic, Send, Bot, User, Volume2, Loader2, University, Pause, Play, Languages } from "lucide-react";
+import Image from "next/image";
+import { Mic, Send, Bot, User, Volume2, Loader2, Pause, Play, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { getResponseAndAudio } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,6 +50,7 @@ export default function Chatbot() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
   const { toast } = useToast();
+  const logoImage = PlaceHolderImages.find(img => img.id === 'university-logo');
 
   const stopPlayback = useCallback(() => {
     if (audioRef.current) {
@@ -216,8 +219,11 @@ export default function Chatbot() {
       <CardHeader className="flex flex-row items-center justify-between border-b">
         <div className="flex items-center gap-3">
           <Avatar>
+             {logoImage ? (
+              <AvatarImage src={logoImage.imageUrl} alt={logoImage.description} />
+            ) : null}
             <AvatarFallback className="bg-primary/20 text-primary">
-              <University />
+              <Bot />
             </AvatarFallback>
           </Avatar>
           <CardTitle className="font-headline text-2xl text-foreground">ज्ञानदूत</CardTitle>
@@ -258,6 +264,9 @@ export default function Chatbot() {
               >
                 {msg.role === "bot" && (
                   <Avatar>
+                    {logoImage ? (
+                      <AvatarImage src={logoImage.imageUrl} alt={logoImage.description} />
+                    ) : null}
                     <AvatarFallback className="bg-primary text-primary-foreground">
                       <Bot />
                     </AvatarFallback>
@@ -295,6 +304,9 @@ export default function Chatbot() {
             {isLoading && (
               <div className="flex items-start gap-3">
                 <Avatar>
+                    {logoImage ? (
+                      <AvatarImage src={logoImage.imageUrl} alt={logoImage.description} />
+                    ) : null}
                   <AvatarFallback className="bg-primary text-primary-foreground">
                     <Bot />
                   </AvatarFallback>
