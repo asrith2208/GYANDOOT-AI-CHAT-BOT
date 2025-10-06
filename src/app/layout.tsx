@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'ज्ञानदूत',
+  title: 'ज्ञानदूत - Uttaranchal University',
   description: 'AI Chatbot for Uttaranchal University',
 };
 

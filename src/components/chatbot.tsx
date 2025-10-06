@@ -87,24 +87,29 @@ export default function Chatbot() {
       recognition.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
         setInput(transcript);
-        setIsRecording(false);
       };
 
       recognition.onerror = (event: any) => {
         console.error("Speech recognition error", event.error);
-        toast({
-          title: "Voice Error",
-          description: `Could not recognize voice. Error: ${event.error}`,
-          variant: "destructive"
-        });
-        setIsRecording(false);
+        if (event.error !== 'no-speech' && event.error !== 'aborted') {
+          toast({
+            title: "Voice Error",
+            description: `Could not recognize voice. Error: ${event.error}`,
+            variant: "destructive"
+          });
+        }
       };
+
+      recognition.onstart = () => {
+        setIsRecording(true);
+      }
 
       recognition.onend = () => {
         setIsRecording(false);
       };
+      
       recognitionRef.current = recognition;
-      setSpeechRecognition(() => recognition); // Use a function to avoid re-renders
+      setSpeechRecognition(recognition);
     }
   }, [toast, language]);
 
@@ -124,16 +129,18 @@ export default function Chatbot() {
         if(recognitionRef.current) {
           recognitionRef.current.lang = language;
           recognitionRef.current.start();
-          setIsRecording(true);
         }
-      } catch (error) {
-        console.error("Could not start recognition", error);
-        toast({
-          title: "Voice Error",
-          description: "Could not start voice recognition. Please check your microphone permissions.",
-          variant: "destructive",
-        });
-        setIsRecording(false);
+      } catch (error: any) {
+        // The error "recognition has already started" is a known issue.
+        // We can safely ignore it, as our `isRecording` state handles the UI.
+        if (error.name !== 'InvalidStateError') {
+          console.error("Could not start recognition", error);
+          toast({
+            title: "Voice Error",
+            description: "Could not start voice recognition. Please check your microphone permissions.",
+            variant: "destructive",
+          });
+        }
       }
     }
   };
