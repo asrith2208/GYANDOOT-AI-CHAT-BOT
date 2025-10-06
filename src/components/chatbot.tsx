@@ -8,13 +8,11 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { getResponse } from "@/app/actions";
+import { getResponse, type Message as ActionMessage } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 
-interface Message {
+interface Message extends ActionMessage {
   id: string;
-  role: "user" | "bot";
-  content: string;
   language?: string;
 }
 
@@ -156,12 +154,15 @@ export default function Chatbot() {
       role: "user",
       content: input,
     };
-    setMessages((prev) => [...prev, userMessage]);
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     setInput("");
     setIsLoading(true);
 
+    const history: ActionMessage[] = newMessages.map(({ id, language, ...rest }) => rest);
+
     try {
-      const result = await getResponse(input);
+      const result = await getResponse(history, input);
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "bot",

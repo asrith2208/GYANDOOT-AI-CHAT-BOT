@@ -11,7 +11,13 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
+const MessageSchema = z.object({
+  role: z.enum(['user', 'bot']),
+  content: z.string(),
+});
+
 const IntentBasedQueryInputSchema = z.object({
+  history: z.array(MessageSchema).describe('The conversation history.'),
   query: z
     .string()
     .describe('The user query, which may contain slang or regional dialects.'),
@@ -38,11 +44,13 @@ const prompt = ai.definePrompt({
   name: 'intentBasedQueryPrompt',
   input: {schema: IntentBasedQueryInputSchema},
   output: {schema: IntentBasedQueryOutputSchema},
-  prompt: `You are a multilingual chatbot for Uttaranchal University. Your goal is to accurately understand user questions, even if they contain slang or regional dialects, and provide helpful answers related to the university.
+  prompt: `You are a multilingual chatbot for Uttaranchal University. Your goal is to accurately understand user questions, even if they contain slang or regional dialects, and provide helpful answers related to the university. You should maintain a conversation history to understand follow-up questions.
 
   If a query is not related to Uttaranchal University, respond with: "For further assistance, please contact our support team at 7842311198."
 
   Otherwise, provide a contextually relevant answer in the detected language, reflecting a friendly, calm, professional, and respectful tone. Be slow-paced, word-by-word, and easy to understand, tailored to the state-wise tone.
+
+  If the user asks to translate the previous answer, please do so.
 
   Consider the following links as the knowledge base for Uttaranchal University:
 
@@ -194,6 +202,11 @@ https://www.onlineuu.in/bba.php
 https://www.onlineuu.in/bca.php
 https://www.onlineuu.in/ba.php
 https://www.uudoon.in/management/mba-executive.php
+
+  Conversation History:
+  {{#each history}}
+  {{role}}: {{content}}
+  {{/each}}
 
   Query: {{{query}}}
 

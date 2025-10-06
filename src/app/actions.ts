@@ -2,9 +2,14 @@
 
 import { handleIntentBasedQuery, type IntentBasedQueryOutput } from "@/ai/flows/intent-based-query-handling";
 
-export async function getResponse(query: string): Promise<IntentBasedQueryOutput> {
+export interface Message {
+  role: "user" | "bot";
+  content: string;
+}
+
+export async function getResponse(history: Message[], query: string): Promise<IntentBasedQueryOutput> {
   try {
-    const response = await handleIntentBasedQuery({ query });
+    const response = await handleIntentBasedQuery({ history, query });
     if (!response || !response.answer || !response.language) {
         throw new Error("Invalid response from AI model.");
     }
