@@ -28,10 +28,6 @@ interface Message {
   audioData?: string;
 }
 
-// For cross-browser compatibility
-const SpeechRecognition =
-  typeof window !== 'undefined' ? (window.SpeechRecognition || (window as any).webkitSpeechRecognition) : null;
-
 export default function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -46,6 +42,7 @@ export default function Chatbot() {
   const [isRecording, setIsRecording] = useState(false);
   const [nowPlaying, setNowPlaying] = useState<string | null>(null);
   const [language, setLanguage] = useState("en-IN");
+  const [speechRecognition, setSpeechRecognition] = useState<any>(null);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -77,12 +74,12 @@ export default function Chatbot() {
   }, [messages, scrollToBottom]);
   
   useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (SpeechRecognition) {
-      recognitionRef.current = new SpeechRecognition();
-      const recognition = recognitionRef.current;
+      const recognition = new SpeechRecognition();
       recognition.continuous = false;
       recognition.interimResults = false;
-      recognition.lang = language; // Set language for speech recognition
+      recognition.lang = language;
 
       recognition.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
@@ -103,11 +100,13 @@ export default function Chatbot() {
       recognition.onend = () => {
         setIsRecording(false);
       };
+      recognitionRef.current = recognition;
+      setSpeechRecognition(() => recognition); // Use a function to avoid re-renders
     }
   }, [toast, language]);
 
   const handleVoiceInput = () => {
-    if (!SpeechRecognition) {
+    if (!speechRecognition) {
       toast({
         title: "Unsupported Browser",
         description: "Your browser does not support voice recognition.",
@@ -318,7 +317,7 @@ export default function Chatbot() {
             disabled={isLoading}
             className="text-base"
           />
-          <Button type="button" size="icon" variant={isRecording ? "destructive" : "outline"} onClick={handleVoiceInput} disabled={isLoading || !SpeechRecognition}>
+          <Button type="button" size="icon" variant={isRecording ? "destructive" : "outline"} onClick={handleVoiceInput} disabled={isLoading || !speechRecognition}>
             <Mic className={cn("h-5 w-5", isRecording && "animate-pulse")} />
             <span className="sr-only">Record voice message</span>
           </Button>
