@@ -2,7 +2,7 @@
 
 Welcome to Gyandoot, an AI-powered admissions assistant personalized for Uttaranchal University. This project is more than just a chatbot; it's a smart, persuasive, and accessible point of contact designed to guide and motivate prospective students.
 
-![Gyandoot Chatbot Interface](https://storage.googleapis.com/stedi-assets/misc/gyandoot-screenshot.png)
+
 
 ### Key Features
 
