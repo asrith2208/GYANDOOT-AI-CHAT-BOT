@@ -1,6 +1,10 @@
 # ज्ञानदूत (Gyandoot) - AI Chatbot for Uttaranchal University
 
+
 Welcome to Gyandoot, an AI-powered admissions assistant personalized for Uttaranchal University. This project is more than just a chatbot; it's a smart, persuasive, and accessible point of contact designed to guide and motivate prospective students.
+
+**Developed by Asrith Behala**
+
 
 
 

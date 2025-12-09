@@ -1,14 +1,8 @@
 'use server';
-/**
- * @fileOverview A regional slang adaptation AI agent.
- *
- * - adaptToRegionalSlang - A function that adapts text to regional slang.
- * - AdaptToRegionalSlangInput - The input type for the adaptToRegionalSlang function.
- * - AdaptToRegionalSlangOutput - The return type for the adaptToRegionalSlang function.
- */
+// Adapts text to regional slang
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
 
 const AdaptToRegionalSlangInputSchema = z.object({
   text: z.string().describe('The text to adapt to regional slang.'),
@@ -28,8 +22,8 @@ export async function adaptToRegionalSlang(input: AdaptToRegionalSlangInput): Pr
 
 const prompt = ai.definePrompt({
   name: 'adaptToRegionalSlangPrompt',
-  input: {schema: AdaptToRegionalSlangInputSchema},
-  output: {schema: AdaptToRegionalSlangOutputSchema},
+  input: { schema: AdaptToRegionalSlangInputSchema },
+  output: { schema: AdaptToRegionalSlangOutputSchema },
   prompt: `You are a regional slang adaptation expert for Indian languages.
 
 You will take the given text and adapt it to include regional slang, idioms, and colloquialisms for the specified language and region.
@@ -48,7 +42,7 @@ const adaptToRegionalSlangFlow = ai.defineFlow(
     outputSchema: AdaptToRegionalSlangOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const { output } = await prompt(input);
     return output!;
   }
 );

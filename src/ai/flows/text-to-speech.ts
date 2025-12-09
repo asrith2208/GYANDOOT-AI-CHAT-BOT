@@ -1,13 +1,8 @@
 'use server';
-/**
- * @fileOverview A Genkit flow for converting text to speech.
- *
- * - textToSpeech - A function that converts text to speech.
- * - TextToSpeechInput - The input type for the textToSpeech function.
- */
+// Converts text to speech using Genkit
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
 import wav from 'wav';
 
 const TextToSpeechInputSchema = z.object({
@@ -23,14 +18,14 @@ const textToSpeechFlow = ai.defineFlow(
       media: z.string(),
     }),
   },
-  async ({text}) => {
-    const {media} = await ai.generate({
+  async ({ text }) => {
+    const { media } = await ai.generate({
       model: 'googleai/gemini-2.5-flash-preview-tts',
       config: {
         responseModalities: ['AUDIO'],
         speechConfig: {
           voiceConfig: {
-            prebuiltVoiceConfig: {voiceName: 'Algenib'},
+            prebuiltVoiceConfig: { voiceName: 'Algenib' },
           },
         },
       },
@@ -51,7 +46,7 @@ const textToSpeechFlow = ai.defineFlow(
 
 export async function textToSpeech(
   input: TextToSpeechInput
-): Promise<{media: string}> {
+): Promise<{ media: string }> {
   const result = await textToSpeechFlow(input);
   return result;
 }

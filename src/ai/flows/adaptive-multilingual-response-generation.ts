@@ -1,14 +1,8 @@
 'use server';
-/**
- * @fileOverview A Genkit flow for generating adaptive multilingual responses for the Uttaranchal University chatbot.
- *
- * - generateAdaptiveResponse - A function that generates contextually relevant answers in multiple Indian languages.
- * - AdaptiveResponseInput - The input type for the generateAdaptiveResponse function.
- * - AdaptiveResponseOutput - The return type for the generateAdaptiveResponse function.
- */
+// Handles adaptive multilingual response generation using Genkit
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
 
 const AdaptiveResponseInputSchema = z.object({
   query: z.string().describe('The user query in any language.'),
@@ -29,8 +23,8 @@ export async function generateAdaptiveResponse(input: AdaptiveResponseInput): Pr
 
 const prompt = ai.definePrompt({
   name: 'adaptiveMultilingualResponsePrompt',
-  input: {schema: AdaptiveResponseInputSchema},
-  output: {schema: AdaptiveResponseOutputSchema},
+  input: { schema: AdaptiveResponseInputSchema },
+  output: { schema: AdaptiveResponseOutputSchema },
   prompt: `You are a multilingual chatbot for Uttaranchal University. You are able to answer questions in multiple Indian languages, and adapt your tone to be appropriate for the region.
 
   The user has asked the following question in any language:
@@ -54,7 +48,7 @@ const adaptiveMultilingualResponseGenerationFlow = ai.defineFlow(
     outputSchema: AdaptiveResponseOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const { output } = await prompt(input);
     return output!;
   }
 );

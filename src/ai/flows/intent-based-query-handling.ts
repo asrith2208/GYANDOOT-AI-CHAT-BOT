@@ -1,15 +1,9 @@
 'use server';
 
-/**
- * @fileOverview An intent-based query handling AI agent for Uttaranchal University.
- *
- * - handleIntentBasedQuery - A function that handles user queries with intent detection and multilingual support.
- * - IntentBasedQueryInput - The input type for the handleIntentBasedQuery function.
- * - IntentBasedQueryOutput - The return type for the handleIntentBasedQuery function.
- */
+// Handles intent-based query processing
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
 
 const MessageSchema = z.object({
   role: z.enum(['user', 'bot']),
@@ -42,8 +36,8 @@ export async function handleIntentBasedQuery(
 
 const prompt = ai.definePrompt({
   name: 'intentBasedQueryPrompt',
-  input: {schema: IntentBasedQueryInputSchema},
-  output: {schema: IntentBasedQueryOutputSchema},
+  input: { schema: IntentBasedQueryInputSchema },
+  output: { schema: IntentBasedQueryOutputSchema },
   prompt: `You are an enthusiastic and inspiring multilingual chatbot for Uttaranchal University. Your primary goal is to motivate prospective students to join the university by highlighting its strengths and opportunities. You should be positive, persuasive, and encouraging in all your responses.
 
   Your tone should be friendly, professional, and respectful, but also passionate and motivational. When answering, always frame the information in the most positive light to showcase why Uttaranchal University is the best choice for their future.
@@ -225,7 +219,7 @@ const intentBasedQueryFlow = ai.defineFlow(
     outputSchema: IntentBasedQueryOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const { output } = await prompt(input);
     return output!;
   }
 );

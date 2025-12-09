@@ -1,6 +1,8 @@
 {
-  "name": "nextn",
+  "name": "gyandoot-ai-chatbot",
   "version": "0.1.0",
+  "description": "AI Chatbot for Uttaranchal University",
+  "author": "Asrith Behala",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack -p 9002",

@@ -1,15 +1,9 @@
 'use server';
 
-/**
- * @fileOverview A multilingual knowledge retrieval AI agent for Uttaranchal University.
- *
- * - multilingualKnowledgeRetrieval - A function that handles the knowledge retrieval process.
- * - MultilingualKnowledgeRetrievalInput - The input type for the multilingualKnowledgeRetrieval function.
- * - MultilingualKnowledgeRetrievalOutput - The return type for the multilingualKnowledgeRetrieval function.
- */
+// Retrieves university information based on user queries
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
 
 const MultilingualKnowledgeRetrievalInputSchema = z.object({
   query: z.string().describe('The user query in any Indian language.'),
@@ -177,8 +171,8 @@ const knowledgeBaseLinks = [
 
 const prompt = ai.definePrompt({
   name: 'multilingualKnowledgeRetrievalPrompt',
-  input: {schema: z.object({ query: MultilingualKnowledgeRetrievalInputSchema.shape.query, knowledgeBaseLinks: z.array(z.string()) })},
-  output: {schema: MultilingualKnowledgeRetrievalOutputSchema},
+  input: { schema: z.object({ query: MultilingualKnowledgeRetrievalInputSchema.shape.query, knowledgeBaseLinks: z.array(z.string()) }) },
+  output: { schema: MultilingualKnowledgeRetrievalOutputSchema },
   prompt: `You are a multilingual chatbot for Uttaranchal University. Answer questions based on the following knowledge base. If the question is not related to the university, or you cannot find the answer in the knowledge base, reply with "For further assistance, please contact our support team at 7842311198."
 
 Knowledge Base:
